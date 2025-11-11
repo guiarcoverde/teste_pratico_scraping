@@ -5,12 +5,7 @@ from datetime import datetime
 import time
 
 
-class ResponseTimeMiddleware:
-    """
-    Mid-level use case: Track response times for monitoring.
-    Useful for identifying slow endpoints and optimization.
-    """
-    
+class ResponseTimeMiddleware:    
     def process_request(self, request, spider):
         request.meta['start_time'] = time.time()
     
@@ -28,11 +23,6 @@ class ResponseTimeMiddleware:
 
 
 class CustomUserAgentMiddleware:
-    """
-    Mid-level use case: Rotate user agents to avoid blocks.
-    More sophisticated than default UserAgentMiddleware.
-    """
-    
     def __init__(self):
         self.user_agents = [
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -47,11 +37,6 @@ class CustomUserAgentMiddleware:
 
 
 class ErrorLoggingMiddleware:
-    """
-    Mid-level use case: Centralized error logging with context.
-    Saves failed URLs to a file for later retry.
-    """
-    
     def __init__(self):
         self.failed_urls = []
     
@@ -87,11 +72,6 @@ class ErrorLoggingMiddleware:
 
 
 class CaptchaDetectionMiddleware:
-    """
-    Mid-level use case: Detect when site returns captcha/block page.
-    Pauses spider to avoid wasting requests.
-    """
-    
     def process_response(self, request, response, spider):
         captcha_indicators = [
             b'captcha',

@@ -6,36 +6,30 @@ from w3lib.html import remove_tags
 
 
 def clean_cnpj(cnpj):
-    """Remove formatação do CNPJ, mantendo apenas dígitos."""
     if not cnpj:
         return ''
     return ''.join(filter(str.isdigit, str(cnpj)))
 
 
 def clean_numero_processo(text):
-    """Remove 'PROCESSO Nº' prefix and keep only the process number."""
     if not text:
         return None
     
     text = text.strip()
     
-    # Use regex to remove any variant of "PROCESSO N" followed by special chars
-    # This handles: PROCESSO Nº, PROCESSO N°, PROCESSO NO, PROCESSO N, etc.
     text = re.sub(r'^PROCESSO\s+N[ºO°]?\s*', '', text, flags=re.IGNORECASE)
     
     return text.strip()
 
 
 def clean_data_autuacao(text):
-    """Remove 'AUTUADO EM' prefix and keep only the date."""
     if not text:
         return None
     
     text = text.strip()
     
-    # Remove "AUTUADO EM" prefix
     if text.upper().startswith('AUTUADO EM'):
-        text = text[10:].strip()  # len('AUTUADO EM') = 10
+        text = text[10:].strip()
     
     return text
 
@@ -46,7 +40,6 @@ def parse_date(date_string):
     
     date_string = date_string.strip()
     
-    # Remove "Em" prefix if present
     if date_string.lower().startswith('em '):
         date_string = date_string[3:].strip()
     
@@ -62,7 +55,6 @@ def parse_date(date_string):
         except ValueError:
             continue
     
-    # If parsing fails, return the original string for debugging
     return date_string
 
 def clean_text(text):

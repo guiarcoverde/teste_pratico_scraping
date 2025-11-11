@@ -13,8 +13,7 @@ class ProcessoSpider(scrapy.Spider):
     
     START_URL = 'http://www5.trf5.jus.br/cp/'
     FORM_ACTION_URL = 'https://cp.trf5.jus.br/cp/cp.do'
-    PROCESSO_URL = 'https://cp.trf5.jus.br/processo/{}'  # Acesso direto por GET
-
+    PROCESSO_URL = 'https://cp.trf5.jus.br/processo/{}'
     custom_settings = {
         'ROBOTSTXT_OBEY': False,
         'CONCURRENT_REQUESTS': 4,
@@ -42,7 +41,6 @@ class ProcessoSpider(scrapy.Spider):
         - Processos individuais: GET direto (mais rápido e eficiente)
         - CNPJ: POST via formulário (necessário para busca)
         """
-        # Processos individuais - Acesso direto via GET
         for processo in self.processos:
             processo = processo.strip()
             if not processo:
@@ -65,7 +63,6 @@ class ProcessoSpider(scrapy.Spider):
                 errback=self.handle_error
             )
         
-        # CNPJ - Requer formulário
         if self.cnpj:
             self.logger.info(f"Acessando formulário para busca por CNPJ: {self.cnpj}")
             
@@ -119,14 +116,12 @@ class ProcessoSpider(scrapy.Spider):
     def parse_processo(self, response):
         self.logger.info(f"Processando página do processo: {response.url}")
         
-        # Debug: Check if process number is found
         has_process = response.xpath("//p[contains(., 'PROCESSO N')]").get()
         self.logger.info(f"Process header found: {has_process is not None}")
         if has_process:
             self.logger.info(f"Process header text: {has_process[:100]}")
         
         if self._is_error_page(response):
-            # Extract more details about why it was detected as error
             processo_num = response.xpath("//p[contains(., 'PROCESSO N')]/text()").get()
             self.logger.error(f"Página de erro detectada: {response.url}")
             self.logger.error(f"Status code: {response.status}")
@@ -134,7 +129,6 @@ class ProcessoSpider(scrapy.Spider):
             self.logger.error(f"Response encoding: {response.encoding}")
             self.logger.error(f"Response body length: {len(response.body)} bytes")
             
-            # Check what triggered the error
             body_text = response.text.lower()
             error_keywords = ['processo não encontrado', 'página não encontrada', 'erro ao consultar', 'consulta inválida', 'nenhum processo foi encontrado']
             found_errors = [kw for kw in error_keywords if kw in body_text]
@@ -260,14 +254,14 @@ class ProcessoSpider(scrapy.Spider):
         if response.status >= 400:
             return True
         
-        # Check if the page has the expected process structure
+        
         has_process_number = response.xpath("//p[contains(., 'PROCESSO N')]").get()
         
-        # If we found a process number, it's NOT an error page
+        
         if has_process_number:
             return False
         
-        # Only check for error indicators if no process number found
+        
         error_indicators = [
             'processo não encontrado',
             'página não encontrada',
